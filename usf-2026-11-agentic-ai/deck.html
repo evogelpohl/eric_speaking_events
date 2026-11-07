@@ -1,0 +1,291 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Notes from the field</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@600;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --usf-green:#006747;
+    --usf-evergreen:#005432;
+    --usf-gold:#CFC493;
+    --usf-sand:#EDEBD1;
+    --bg:#0B1411;
+    --surface:#13201A;
+    --surface-2:#1A2A22;
+    --line:#274236;
+    --text:#F3F0E4;
+    --muted:#A8B5AD;
+    --green-text:#5FC39A;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%;background:var(--bg);color:var(--text);font-family:"Barlow",system-ui,-apple-system,"Segoe UI",sans-serif;overflow:hidden}
+  body{display:flex;align-items:center;justify-content:center}
+
+  /* 1920x1080 stage, scaled to fit the window */
+  #stage{position:relative;width:1920px;height:1080px;transform-origin:center center;flex:none}
+  .slide{position:absolute;inset:0;padding:84px 120px 84px;display:none;flex-direction:column}
+  .slide.active{display:flex}
+
+  /* type */
+  h1,h2{font-family:"Barlow Condensed","Barlow",sans-serif;font-weight:800;letter-spacing:-.01em;line-height:1}
+  h1{font-size:128px}
+  h2{font-size:80px;margin-bottom:32px}
+  h3{font-family:"Barlow Condensed","Barlow",sans-serif;font-weight:700;font-size:44px;line-height:1.05}
+  .eyebrow{font-family:"Barlow Condensed","Barlow",sans-serif;font-weight:700;font-size:28px;letter-spacing:.14em;text-transform:uppercase;color:var(--usf-gold);margin-bottom:28px}
+  .sub{font-size:44px;color:var(--muted);font-weight:400;line-height:1.25}
+  ul{list-style:none}
+  li{position:relative;padding-left:40px;font-size:34px;line-height:1.3;margin-bottom:18px;font-weight:400}
+  li::before{content:"";position:absolute;left:0;top:.52em;width:18px;height:6px;background:var(--usf-gold);border-radius:3px}
+  li strong{font-weight:600;color:var(--text)}
+  .muted{color:var(--muted)}
+  .gold{color:var(--usf-gold)}
+  .green{color:var(--green-text)}
+
+  /* layout helpers */
+  .grid{display:grid;gap:32px;flex:1;min-height:0}
+  .cols-4{grid-template-columns:repeat(4,1fr)}
+  .cols-3{grid-template-columns:repeat(3,1fr)}
+  .cols-2{grid-template-columns:repeat(2,1fr)}
+  .card{background:var(--surface);border-top:10px solid var(--usf-green);border-radius:6px;padding:30px 32px 24px;display:flex;flex-direction:column;min-height:0}
+  .card h3{color:var(--usf-gold);margin-bottom:10px}
+  .card .tag{display:inline-block;white-space:nowrap;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:24px;letter-spacing:.08em;text-transform:uppercase;color:var(--bg);background:var(--usf-gold);padding:4px 12px;border-radius:4px;margin-bottom:22px;align-self:flex-start}
+  .card .tag.green{background:var(--usf-green);color:var(--text)}
+  .card .tag.dim{background:var(--surface-2);color:var(--muted);border:2px solid var(--line)}
+  .card li{font-size:28px;line-height:1.25;padding-left:32px;margin-bottom:12px}
+  .card li::before{width:14px;height:5px;top:.55em}
+
+  /* maturity meter on theme cards */
+  .meter{margin-top:auto;padding-top:16px}
+  .meter .lbl{display:flex;justify-content:space-between;font-size:22px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;font-family:"Barlow Condensed",sans-serif;font-weight:700;margin-bottom:8px}
+  .meter .bar{height:12px;background:var(--surface-2);border-radius:6px;overflow:hidden}
+  .meter .bar i{display:block;height:100%;background:linear-gradient(90deg,var(--usf-green),var(--green-text));border-radius:6px}
+
+  /* big callout bar */
+  .callout{margin-top:28px;background:var(--usf-green);border-radius:6px;padding:26px 40px;font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:40px;line-height:1.15;display:flex;align-items:center;gap:28px}
+  .callout .k{color:var(--usf-gold);letter-spacing:.1em;text-transform:uppercase;font-size:28px;flex:none}
+
+  /* numbered steps */
+  ol{list-style:none}
+  ol li,.card ol li{padding-left:72px;font-size:30px;margin-bottom:20px}
+  ol li::before{display:none}
+  ol li .n{position:absolute;left:0;top:-2px;width:50px;height:50px;border-radius:50%;border:3px solid var(--usf-gold);color:var(--usf-gold);display:flex;align-items:center;justify-content:center;font-family:"Barlow Condensed",sans-serif;font-weight:800;font-size:28px}
+
+  /* ontology stack */
+  .stack{background:var(--surface);border-top:10px solid var(--usf-green);border-radius:6px;padding:26px 30px 26px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:hidden}
+  .stack h3{color:var(--usf-gold);margin-bottom:6px}
+  .layer{display:grid;grid-template-columns:300px 1fr;gap:22px;align-items:center;padding:14px 24px;border-radius:6px;background:var(--surface-2);border-left:10px solid var(--usf-gold);flex:1}
+  .layer .name{font-family:"Barlow Condensed","Barlow",sans-serif;font-weight:800;font-size:36px;line-height:1;color:var(--usf-gold)}
+  .layer .ex{font-size:26px;line-height:1.25;color:var(--text)}
+  .layer.l1{background:#1E3328;border-left-color:#5FC39A}
+  .layer.l2{background:#1B2E25;border-left-color:#8FCDB0}
+  .layer.l3{background:#182A22;border-left-color:#B8CBA3}
+  .layer.l4{background:#16261F;border-left-color:var(--usf-gold)}
+  .defs{display:flex;flex-direction:column;gap:24px;min-height:0}
+  .defs .card{flex:1;padding:24px 30px 18px}
+  .defs .card h3{font-size:38px;margin-bottom:12px}
+  .defs .card li{font-size:26px;margin-bottom:8px}
+  /* closing slide points */
+  .points{gap:72px;margin-top:8px}
+  .points .col{display:flex;flex-direction:column;justify-content:space-between;gap:28px;min-height:0}
+  .pt .k{font-family:"Barlow Condensed","Barlow",sans-serif;font-weight:800;font-size:40px;letter-spacing:.08em;text-transform:uppercase;color:var(--usf-gold);line-height:1;margin-bottom:10px}
+  .pt p{font-size:34px;line-height:1.3;color:var(--text)}
+  /* progressive reveal */
+  .frag{opacity:0;transform:translateY(14px);transition:opacity .35s ease,transform .35s ease}
+  .frag.on{opacity:1;transform:none}
+  @media print{.frag{opacity:1;transform:none}}
+  /* full-slide figure */
+  .figure{flex:1;min-height:0;display:flex;align-items:center;justify-content:center}
+  .figure img{max-width:100%;max-height:100%;border-radius:10px;box-shadow:0 0 0 3px var(--line)}
+
+  /* chrome: logo plate, footer, counter */
+  .brand{position:absolute;right:120px;top:64px;display:flex;align-items:center}
+  .brand img{height:84px;display:block}
+  .title-slide .brand img{height:150px}
+  .title-slide{justify-content:center}
+  .title-slide .who{margin-top:72px;display:flex;align-items:center;gap:36px}
+  .title-slide .who .rule{width:12px;height:120px;background:var(--usf-gold);border-radius:6px;flex:none}
+  .title-slide .who .name{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:56px;line-height:1.05}
+  .title-slide .who .role{font-size:34px;color:var(--muted);margin-top:8px}
+
+  /* nav hit zones + help */
+  .zone{position:fixed;top:0;bottom:0;width:50%;cursor:pointer;z-index:5}
+  .zone.l{left:0}.zone.r{right:0}
+  #help{position:fixed;left:16px;bottom:12px;font-size:12px;color:#5f6e66;font-family:system-ui;z-index:6;opacity:.7}
+  @media print{
+    html,body{overflow:visible;background:var(--bg)}
+    #stage{transform:none!important;width:1920px;height:auto}
+    .slide{position:relative;display:flex!important;height:1080px;page-break-after:always}
+    .zone,#help{display:none}
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+
+  <!-- 1 · Title -->
+  <section class="slide title-slide active">
+    <div class="brand"><img src="assets/usf-bulls-logo.png" alt="USF Bulls"></div>
+    <div class="eyebrow">ISM 6173 &middot; Agentic AI and Business Process Design &middot; Session 4 &middot; November 7, 2026</div>
+    <h1>Notes from the field</h1>
+    <p class="sub" style="margin-top:28px">AI in the enterprise. What is working, what is next and where you fit.</p>
+    <div class="who">
+      <div class="rule"></div>
+      <div>
+        <div class="name">Eric Vogelpohl</div>
+        <div class="role">Field CTO, Presidio Data &amp; AI &nbsp;|&nbsp; Main client: Advisor to the CTO, NHL</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 · Four themes -->
+  <section class="slide">
+    <div class="brand"><img src="assets/usf-bulls-logo.png" alt="USF Bulls"></div>
+    <div class="eyebrow">The enterprise today</div>
+    <h2>4 AI solution areas &amp; adoption</h2>
+    <div class="grid cols-4">
+      <div class="card frag">
+        <h3>Chat and research</h3>
+        <span class="tag green">Broadly adopted</span>
+        <ul>
+          <li>Copilot, Claude Desktop, ChatGPT</li>
+          <li>Skills and tools turn them into agentic assistants, tasks at the user's scope</li>
+          <li>Fewer companies build their own harness</li>
+        </ul>
+        <div class="meter"><div class="lbl"><span>Adoption</span><span>High</span></div><div class="bar"><i style="width:92%"></i></div></div>
+      </div>
+      <div class="card frag">
+        <h3>Coding</h3>
+        <span class="tag">Mature, under-adopted</span>
+        <ul>
+          <li>Biggest single return</li>
+          <li>IT operations and security slower to adopt, but gaining</li>
+          <li>Managers are starting to hear about the "dark factory" for app dev</li>
+        </ul>
+        <div class="meter"><div class="lbl"><span>Adoption</span><span>Growing</span></div><div class="bar"><i style="width:65%"></i></div></div>
+      </div>
+      <div class="card frag">
+        <h3>Agentic workflows</h3>
+        <span class="tag">AI that does work</span>
+        <ul>
+          <li>Early misses: call centers</li>
+          <li>Low code: n8n, Step Functions, Logic Apps</li>
+          <li>Managed runtimes: Claude, AgentCore, Foundry</li>
+          <li>Trap: rebuilding the old app as an agent</li>
+        </ul>
+        <div class="meter"><div class="lbl"><span>Adoption</span><span>Early</span></div><div class="bar"><i style="width:20%"></i></div></div>
+      </div>
+      <div class="card frag">
+        <h3>Data agents</h3>
+        <span class="tag dim">Settled, capped</span>
+        <ul>
+          <li>"Chat with your data". Snowflake, Databricks and Microsoft Fabric lead</li>
+          <li>Works for narrow questions</li>
+          <li>All eyes on the ontology to widen that to the whole value chain</li>
+        </ul>
+        <div class="meter"><div class="lbl"><span>Dependability</span><span>Partial</span></div><div class="bar"><i style="width:45%"></i></div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 · Ontology -->
+  <section class="slide">
+    <div class="brand"><img src="assets/usf-bulls-logo.png" alt="USF Bulls"></div>
+    <div class="eyebrow">The agentic enterprise</div>
+    <h2>All eyes on the ontology</h2>
+    <div class="grid cols-2" style="grid-template-columns:1.15fr 1fr">
+      <div class="stack">
+        <h3>Ontology</h3>
+        <div class="layer l4"><div class="name">Rules and constraints</div><div class="ex">What must hold. Orders on hold cannot ship. Credit limits. Regulations</div></div>
+        <div class="layer l3"><div class="name">Measures</div><div class="ex">The numbers and how each is computed. Revenue, churn, on-time rate</div></div>
+        <div class="layer l2"><div class="name">Relationships</div><div class="ex">How nouns connect. A customer places an order. A shipment fulfills it</div></div>
+        <div class="layer l1"><div class="name">Concepts</div><div class="ex">The nouns of your business. Customer, order, product, shipment</div></div>
+      </div>
+      <div class="defs">
+        <div class="card frag">
+          <h3>Knowledge graph</h3>
+          <ul>
+            <li>Your ontology with your real records plugged in</li>
+            <li>Every customer, order and shipment, connected</li>
+            <li>What an agent follows to answer "why"</li>
+          </ul>
+        </div>
+        <div class="card frag">
+          <h3>Knowledge base</h3>
+          <ul>
+            <li>Documents and facts the agent retrieves</li>
+            <li>Policies, manuals, past tickets. Text, not structure</li>
+          </ul>
+        </div>
+        <div class="card frag">
+          <h3>Semantic model</h3>
+          <ul>
+            <li>The measures layer for BI and SQL</li>
+            <li>Metric definitions over tables. Power BI, dbt, Databricks</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="callout"><span class="k">Why now</span><span>The agentic enterprise is coming. Its agents will need the context of your whole value chain.</span></div>
+  </section>
+
+  <!-- 3b · Reference figure -->
+  <section class="slide">
+    <div class="brand"><img src="assets/usf-bulls-logo.png" alt="USF Bulls"></div>
+    <div class="eyebrow">Reference &middot; ontology + data = knowledge graph</div>
+    <div class="figure"><img src="assets/ontology-plus-data.png" alt="Ontology classes on top, data records below, linked by instance-of arrows"></div>
+  </section>
+
+  <!-- 5 · What you bring -->
+  <section class="slide">
+    <div class="brand"><img src="assets/usf-bulls-logo.png" alt="USF Bulls"></div>
+    <div class="eyebrow">You, in the next 2 years</div>
+    <h2>Be the boss of your agents</h2>
+    <div class="grid cols-2 points">
+      <div class="col">
+        <div class="pt"><div class="k">Read the room</div><p>PE firms, the Big 4, Bain and McKinsey are all in on AI disruption. "We can't do that" gets you exited.</p></div>
+        <div class="pt"><div class="k">Find your voice</div><p>Aggressive use that fits your company's culture and responsibilities.</p></div>
+        <div class="pt"><div class="k">Fluency</div><p>A daily working relationship with Claude or GPT. You can't disrupt with a tool you don't know.</p></div>
+        <div class="pt"><div class="k">Domain knowledge, amplified</div><p>The model doesn't know your value chain or your jargon. You do.</p></div>
+      </div>
+      <div class="col frag">
+        <div class="pt"><div class="k">Data work is open to you</div><p>Data engineering, data science, advanced stats. Syntax used to stop you. It doesn't now.</p></div>
+        <div class="pt"><div class="k">One-pizza teams</div><p>Hypothesize, build, test and iterate in a week.</p></div>
+        <div class="pt"><div class="k">Hand-off roles are evaporating</div><p>Business analyst, requirements gatherer, QA tester. No apologies.</p></div>
+        <div class="pt"><div class="k">IT and security stay</div><p>Then ask why your team hands anything else to anyone.</p></div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="zone l" title="Previous"></div>
+<div class="zone r" title="Next"></div>
+<div id="help">&larr; &rarr; or click &middot; F fullscreen &middot; Home/End</div>
+
+<script>
+(function(){
+  var slides=[].slice.call(document.querySelectorAll('.slide')),i=0;
+  function fit(){var s=Math.min(innerWidth/1920,innerHeight/1080);document.getElementById('stage').style.transform='scale('+s+')';}
+  function frags(){return [].slice.call(slides[i].querySelectorAll('.frag'));}
+  function go(n,fromBack){i=Math.max(0,Math.min(slides.length-1,n));slides.forEach(function(s,k){s.classList.toggle('active',k===i)});frags().forEach(function(f){f.classList.toggle('on',!!fromBack)});location.hash=i+1;}
+  function next(){var f=frags().filter(function(x){return !x.classList.contains('on')});if(f.length){f[0].classList.add('on');}else if(i<slides.length-1){go(i+1);}}
+  function prev(){var f=frags().filter(function(x){return x.classList.contains('on')});if(f.length){f[f.length-1].classList.remove('on');}else if(i>0){go(i-1,true);}}
+  addEventListener('resize',fit);fit();
+  var h=parseInt(location.hash.slice(1),10);if(h>0)go(h-1);
+  addEventListener('keydown',function(e){
+    if(['ArrowRight','ArrowDown','PageDown',' ','Enter'].indexOf(e.key)>-1){e.preventDefault();next();}
+    else if(['ArrowLeft','ArrowUp','PageUp','Backspace'].indexOf(e.key)>-1){e.preventDefault();prev();}
+    else if(e.key==='Home')go(0);else if(e.key==='End')go(slides.length-1);
+    else if(e.key==='f'||e.key==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}
+  });
+  document.querySelector('.zone.r').onclick=next;
+  document.querySelector('.zone.l').onclick=prev;
+})();
+</script>
+</body>
+</html>
